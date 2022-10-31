@@ -1,0 +1,41 @@
+{
+    "manifest_version": 2,
+    "name": "Amazon Orders to Beancount",
+    "version": "0.1",
+    "developer": {
+        "name": "MetroWind",
+        "url": "https://darksair.org/"
+    },
+
+    "description": "Scrap order info from Amazon, and generate Beancount entries.",
+
+    "icons": {
+        "48": "icon.svg",
+        "96": "icon.svg"
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["*://*.amazon.com/gp/*/order-history?*"],
+            "js": ["orders.js"]
+        }
+    ],
+
+    "options_ui": {
+        "page": "options.html",
+        "browser_style": true,
+        "chrome_style": true
+    },
+
+    "permissions": [
+        "storage",
+        "webRequest"
+    ],
+
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "amazon-bean@darksair.org"
+        }
+    }
+
+}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+  </head>
+
+  <body>
+    <form>
+      <div>
+        <label for="charge_text">Charge leading text</label>
+        <input type="text" id="charge_text" name="charge_text" />
+      </div>
+      <p>What is the “charge leading text”? Open an invoice of an
+        order on Amazon, you should see two tables. At the bottom
+        right corner of the last table, you should see some text
+        followed by a date followed by an amount. The text before the
+        date is the “charge leading text”.
+      </p>
+      <div>
+        <label for="paying_account">Paying account in Beancount</label>
+        <input type="text" id="paying_account" name="paying_account" />
+      </div>
+      <div>
+        <label for="tax_account">Tax account in Beancount</label>
+        <input type="text" id="tax_account" name="tax_account" />
+      </div>
+      <div>
+        <label for="shipping_account">Shipping account in Beancount</label>
+        <input type="text" id="shipping_account" name="shipping_account" />
+      </div>
+      <div>
+        <label for="expense_account">Expense account in Beancount</label>
+        <input type="text" id="expense_account" name="expense_account" />
+      </div>
+      <div>
+        <button type="submit">Save</button>
+      </div>
+    </form>
+    <script src="options.js"></script>
+  </body>
+</html>
