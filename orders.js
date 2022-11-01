@@ -45,7 +45,6 @@ if(typeof(String.prototype.searchBetween) === "undefined")
     };
 }
 
-console.log("ccc");
 class Order
 {
     constructor()
@@ -60,7 +59,6 @@ class Order
     }
 }
 
-console.log("bbb");
 class OrderReader
 {
     constructor() {}
@@ -75,7 +73,6 @@ class OrderReader
             if(links[i].textContent.trim() == "View invoice")
             {
                 detail_uri = links[i].href;
-                console.log(`Invoice URI is ${detail_uri}`);
                 break;
             }
         }
@@ -149,15 +146,11 @@ class OrderReader
 
     async readOrders()
     {
-        console.log("Reading orders...");
         let thunks = new Array();
         for(const node of document.querySelectorAll(".order-card"))
         {
             thunks.push(this.#orderNodeToFetch(node));
         }
-        console.log(`Found ${thunks.length} orders.`);
-        let titles = new Array();
-
         let orders = new Array();
         for(var fetch_thunk of thunks)
         {
