@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Amazon Orders to Beancount",
-    "version": "0.3",
+    "version": "0.4",
     "developer": {
         "name": "MetroWind",
         "url": "https://darksair.org/"
@@ -19,9 +19,13 @@
             "matches": [
                 "*://*.amazon.com/gp/*/order-history?*",
                 "*://amazon.com/gp/*/order-history?*",
+                "*://*.amazon.com/your-orders/orders?*",
+                "*://amazon.com/your-orders/orders?*",
 
                 "*://*.amazon.ca/gp/*/order-history?*",
-                "*://amazon.ca/gp/*/order-history?*"
+                "*://amazon.ca/gp/*/order-history?*",
+                "*://*.amazon.ca/your-orders/orders?*",
+                "*://amazon.ca/your-orders/orders?*"
             ],
             "js": ["orders.js"]
         }
