@@ -112,7 +112,13 @@ class OrderReader
         let order = new Order();
         // Extract order number
         let title = html.searchBetween("<b class=\"h1\">", "</b>").trim();
-        order.number = title.match(/Final Details for Order #(.*)/)[1];
+        let title_match = title.match(/Final Details for Order #(.*)/);
+        if(title_match === null)
+        {
+            // This usually means the order has not settled yet.
+            return null;
+        }
+        order.number = title_match[1];
 
         let parser = new DOMParser();
         let doc = parser.parseFromString(html, "text/html");
@@ -133,6 +139,12 @@ class OrderReader
             order.charged = this.#parseDollarAmount(
                 node.nextElementSibling.innerText.trim());
             break;
+        }
+        if(order.charged === 0.0)
+        {
+            // This probably means the finantial transaction has not
+            // happened yet, unless the purchase is really free...
+            return null;
         }
 
         order.price = this.#parseDollarAmount(
@@ -155,7 +167,11 @@ class OrderReader
         for(var fetch_thunk of thunks)
         {
             let html = await fetch_thunk;
-            orders.push(this.#invoiceToOrder(html));
+            let order = this.#invoiceToOrder(html);
+            if(order !== null)
+            {
+                orders.push(order);
+            }
         }
         return orders;
     }
