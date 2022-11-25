@@ -97,12 +97,20 @@ class OrderReader
                 return node.nextElementSibling.textContent.trim();
             }
         }
+        return "$0";
     }
 
-    // “$12.34” –> 12.34
+    // “-$12.34” –> -12.34
     #parseDollarAmount(s)
     {
-        return parseFloat(s.substring(1));
+        if(s[0] == "-")
+        {
+            return -parseFloat(s.substring(2));
+        }
+        else
+        {
+            return parseFloat(s.substring(1));
+        }
     }
 
     // This is probably the most brittle function here. Extract order
@@ -147,8 +155,11 @@ class OrderReader
             return null;
         }
 
-        order.price = this.#parseDollarAmount(
+        let price = this.#parseDollarAmount(
             this.#parseInvoiceKeyValue(doc, "Item(s) Subtotal:"));
+        let reward = this.#parseDollarAmount(
+            this.#parseInvoiceKeyValue(doc, "Rewards Points:"));
+        order.price = price + reward;
         order.tax = this.#parseDollarAmount(
             this.#parseInvoiceKeyValue(doc, "Estimated tax to be collected:"));
         order.shipping = this.#parseDollarAmount(
