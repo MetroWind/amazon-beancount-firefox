@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Amazon Orders to Beancount",
-    "version": "0.4",
+    "version": "1.0",
     "developer": {
         "name": "MetroWind",
         "url": "https://darksair.org/"

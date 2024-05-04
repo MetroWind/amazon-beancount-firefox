@@ -54,7 +54,7 @@ class Order
         this.price = 0;
         this.tax = 0;
         this.shipping = 0;
-        this.charged = 0;
+        this.charges = [];
         this.number = "";
     }
 }
@@ -88,11 +88,15 @@ class OrderReader
         });
     }
 
-    #parseInvoiceKeyValue(invoice_doc, key)
+    #parseInvoiceKeyValue(invoice_doc, key_pattern)
     {
         for(const node of invoice_doc.querySelectorAll("td"))
         {
-            if(node.textContent.trim() == key)
+            if(node.querySelector("*") != null)
+            {
+                continue;
+            }
+            if(key_pattern.test(node.textContent))
             {
                 return node.nextElementSibling.textContent.trim();
             }
@@ -100,7 +104,8 @@ class OrderReader
         return "$0";
     }
 
-    // “-$12.34” –> -12.34
+    // “-$12.34” –> -12.34. Ideally I should use integer to process
+    // prices. But I’m too lazy.
     #parseDollarAmount(s)
     {
         if(s[0] == "-")
@@ -144,11 +149,10 @@ class OrderReader
 
             order.date = new Date(text.substring(trans_begin.length + 1,
                                                  text.length - 1));
-            order.charged = this.#parseDollarAmount(
-                node.nextElementSibling.innerText.trim());
-            break;
+            order.charges.push(this.#parseDollarAmount(
+                node.nextElementSibling.innerText.trim()));
         }
-        if(order.charged === 0.0)
+        if(order.charges.length == 0)
         {
             // This probably means the finantial transaction has not
             // happened yet, unless the purchase is really free...
@@ -156,14 +160,22 @@ class OrderReader
         }
 
         let price = this.#parseDollarAmount(
-            this.#parseInvoiceKeyValue(doc, "Item(s) Subtotal:"));
+            this.#parseInvoiceKeyValue(doc, /Item\(s\) Subtotal:/));
         let reward = this.#parseDollarAmount(
-            this.#parseInvoiceKeyValue(doc, "Rewards Points:"));
+            this.#parseInvoiceKeyValue(doc, /Rewards Points:/)); // This is negative.
+        reward += this.#parseDollarAmount(
+            this.#parseInvoiceKeyValue(doc, /Coupon/));
+        reward += this.#parseDollarAmount(
+            this.#parseInvoiceKeyValue(doc, /save [0-9]+%/));
+        reward += this.#parseDollarAmount(
+            this.#parseInvoiceKeyValue(doc, /Subscribe & Save/));
+        reward += this.#parseDollarAmount(
+            this.#parseInvoiceKeyValue(doc, /Gift Card Amount/));
         order.price = price + reward;
         order.tax = this.#parseDollarAmount(
-            this.#parseInvoiceKeyValue(doc, "Estimated tax to be collected:"));
+            this.#parseInvoiceKeyValue(doc, /Estimated tax to be collected:/));
         order.shipping = this.#parseDollarAmount(
-            this.#parseInvoiceKeyValue(doc, "Shipping & Handling:"));
+            this.#parseInvoiceKeyValue(doc, /Shipping & Handling:/));
         return order;
     }
 
@@ -211,8 +223,11 @@ ${order.price.toFixed(2)} USD`);
             lines.push(`  ${options.shipping_account} \
 ${order.shipping.toFixed(2)} USD`);
         }
-        lines.push(`  ${options.paying_account} \
--${order.charged.toFixed(2)} USD`);
+        for(const charge of order.charges)
+        {
+            lines.push(`  ${options.paying_account} \
+-${charge.toFixed(2)} USD`);
+        }
         return lines.join('\n');
     }
 }
